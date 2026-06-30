@@ -1,9 +1,12 @@
+const path = require("path");
 const { getDefaultConfig } = require("expo/metro-config");
-const nodeLibs = require("node-libs-react-native");
 
 const config = getDefaultConfig(__dirname);
 
-// Polyfill all Node.js built-ins that ws (used by Supabase Realtime) requires
-config.resolver.extraNodeModules = nodeLibs;
+// Replace `ws` with a React Native shim — RN has WebSocket built-in globally,
+// so we never need the Node.js `ws` package or any of its Node-only dependencies.
+config.resolver.extraNodeModules = {
+  ws: path.resolve(__dirname, "src/lib/ws-native.js"),
+};
 
 module.exports = config;
