@@ -17,7 +17,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { OnboardingProvider } from "./src/context/OnboardingContext";
 import { OnboardingNavigator } from "./src/screens/onboarding";
-import "./nativewind-env";
 
 SplashScreen.preventAutoHideAsync();
 
