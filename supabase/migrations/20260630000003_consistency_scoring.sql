@@ -278,8 +278,11 @@ COMMENT ON FUNCTION process_verification(UUID, TEXT, TEXT, TEXT) IS
 -- ── 6. Enrich pending_verifications view ──────────────────────────────────────
 -- Replace the minimal view from migration 20260630000001 with a richer one
 -- that includes all fields needed by the admin dashboard.
+-- DROP first because CREATE OR REPLACE cannot reorder existing columns.
 
-CREATE OR REPLACE VIEW pending_verifications AS
+DROP VIEW IF EXISTS pending_verifications;
+
+CREATE VIEW pending_verifications AS
 SELECT
     v.id               AS verification_id,
     v.user_id,
