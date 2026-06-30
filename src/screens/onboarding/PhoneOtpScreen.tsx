@@ -8,11 +8,8 @@
 import React, { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -233,107 +230,93 @@ export function PhoneOtpScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.flex}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.wordmark}>ምሳሌ</Text>
-            <Text style={styles.heading}>
-              {phase === "phone" ? "Enter your number" : "Verify your number"}
-            </Text>
-            <Text style={styles.sub}>
-              {phase === "phone"
-                ? "We'll send a one-time code to confirm your identity."
-                : `We sent a 6-digit code to ${e164Phone}`}
-            </Text>
-          </View>
+      {/* Top: header + phone/otp field */}
+      <View style={styles.top}>
+        <Text style={styles.wordmark}>ምሳሌ</Text>
+        <Text style={styles.heading}>
+          {phase === "phone" ? "Enter your number" : "Verify your number"}
+        </Text>
+        <Text style={styles.sub}>
+          {phase === "phone"
+            ? "We'll send a one-time code to confirm your identity."
+            : `We sent a 6-digit code to ${e164Phone}`}
+        </Text>
 
-          {/* Phone input (phase 1) */}
-          {phase === "phone" && (
-            <>
-              <Pressable
-                style={styles.phoneField}
-                onPress={() => phoneRef.current?.focus()}
-              >
-                <Text style={styles.countryPrefix}>🇪🇹 +</Text>
-                <Text style={styles.phoneText}>
-                  {phoneInput || (
-                    <Text style={styles.placeholder}>2519 *** ****</Text>
-                  )}
-                </Text>
-                {/* Hidden input captures keyboard on web/emulator */}
-                <TextInput
-                  ref={phoneRef}
-                  value={phoneInput}
-                  onChangeText={setPhoneInput}
-                  keyboardType="phone-pad"
-                  style={styles.hiddenInput}
-                  maxLength={15}
-                />
-              </Pressable>
-
-              <NumericPad onKey={handlePhoneKey} disabled={loading} />
-
-              <View style={styles.actionRow}>
-                {error && <Text style={styles.errorText}>{error}</Text>}
-                <PrimaryButton
-                  label={loading ? "" : "Send Code"}
-                  onPress={sendOtp}
-                  loading={loading}
-                  disabled={phoneInput.length < 7}
-                />
-              </View>
-            </>
-          )}
-
-          {/* OTP input (phase 2) */}
-          {phase === "otp" && (
-            <>
-              <OtpDots code={otpCode} />
-
-              {loading && (
-                <View style={styles.verifyingRow}>
-                  <ActivityIndicator size="small" color="#C9933A" />
-                  <Text style={styles.verifyingText}>Verifying…</Text>
-                </View>
+        {phase === "phone" && (
+          <Pressable
+            style={styles.phoneField}
+            onPress={() => phoneRef.current?.focus()}
+          >
+            <Text style={styles.countryPrefix}>🇪🇹 +</Text>
+            <Text style={styles.phoneText}>
+              {phoneInput || (
+                <Text style={styles.placeholder}>2519 *** ****</Text>
               )}
+            </Text>
+            <TextInput
+              ref={phoneRef}
+              value={phoneInput}
+              onChangeText={setPhoneInput}
+              keyboardType="phone-pad"
+              style={styles.hiddenInput}
+              maxLength={15}
+            />
+          </Pressable>
+        )}
 
-              <NumericPad onKey={handleOtpKey} disabled={loading} />
+        {phase === "otp" && <OtpDots code={otpCode} />}
+      </View>
 
-              {error && <Text style={[styles.errorText, styles.errorCenter]}>{error}</Text>}
+      {/* Bottom: keypad + action */}
+      <View style={styles.bottom}>
+        {phase === "phone" && (
+          <>
+            <NumericPad onKey={handlePhoneKey} disabled={loading} />
+            {error && <Text style={styles.errorText}>{error}</Text>}
+            <View style={styles.actionRow}>
+              <PrimaryButton
+                label={loading ? "" : "Send Code"}
+                onPress={sendOtp}
+                loading={loading}
+                disabled={phoneInput.length < 7}
+              />
+            </View>
+          </>
+        )}
 
-              <Pressable
-                onPress={() => { setPhase("phone"); setOtpCode(""); setError(null); }}
-                style={styles.resendRow}
-              >
-                <Text style={styles.resendText}>
-                  Didn't receive it?{" "}
-                  <Text style={styles.resendLink}>Resend code</Text>
-                </Text>
-              </Pressable>
-            </>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        {phase === "otp" && (
+          <>
+            {loading && (
+              <View style={styles.verifyingRow}>
+                <ActivityIndicator size="small" color="#C9933A" />
+                <Text style={styles.verifyingText}>Verifying…</Text>
+              </View>
+            )}
+            <NumericPad onKey={handleOtpKey} disabled={loading} />
+            {error && <Text style={[styles.errorText, styles.errorCenter]}>{error}</Text>}
+            <Pressable
+              onPress={() => { setPhase("phone"); setOtpCode(""); setError(null); }}
+              style={styles.resendRow}
+            >
+              <Text style={styles.resendText}>
+                Didn't receive it?{" "}
+                <Text style={styles.resendLink}>Resend code</Text>
+              </Text>
+            </Pressable>
+          </>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe:        { flex: 1, backgroundColor: "#0D0C0B" },
-  flex:        { flex: 1 },
-  scroll:      { flexGrow: 1, paddingHorizontal: 24, paddingTop: 48, paddingBottom: 32 },
-  header:      { marginBottom: 32 },
+  safe:   { flex: 1, backgroundColor: "#0D0C0B" },
+  top:    { paddingHorizontal: 24, paddingTop: 48, paddingBottom: 16 },
+  bottom: { flex: 1, paddingHorizontal: 24, paddingBottom: 24, justifyContent: "flex-end" },
   wordmark:    { fontSize: 28, color: "#C9933A", fontWeight: "700", marginBottom: 24 },
   heading:     { fontSize: 28, fontWeight: "700", color: "#F5F0E8", marginBottom: 8, letterSpacing: -0.3 },
-  sub:         { fontSize: 15, color: "#7A7066", lineHeight: 22 },
+  sub:         { fontSize: 15, color: "#7A7066", lineHeight: 22, marginBottom: 28 },
   phoneField: {
     flexDirection: "row",
     alignItems: "center",
@@ -343,19 +326,18 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 20,
     height: 64,
-    marginBottom: 24,
     gap: 8,
   },
   countryPrefix: { fontSize: 18, color: "#F5F0E8" },
   phoneText:     { fontSize: 22, fontWeight: "500", color: "#F5F0E8", flex: 1, letterSpacing: 1 },
   placeholder:   { color: "#3A3835" },
   hiddenInput:   { position: "absolute", opacity: 0, width: 1, height: 1 },
-  actionRow:     { marginTop: 24, gap: 12 },
-  errorText:     { fontSize: 13, color: "#E05A5A", textAlign: "left" },
+  actionRow:     { marginTop: 12 },
+  errorText:     { fontSize: 13, color: "#E05A5A", textAlign: "left", marginTop: 8 },
   errorCenter:   { textAlign: "center", marginTop: 8 },
   verifyingRow:  { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 8 },
   verifyingText: { fontSize: 14, color: "#7A7066" },
-  resendRow:     { marginTop: 24, alignItems: "center" },
+  resendRow:     { marginTop: 20, alignItems: "center" },
   resendText:    { fontSize: 14, color: "#7A7066" },
   resendLink:    { color: "#C9933A", fontWeight: "600" },
 });
