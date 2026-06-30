@@ -96,3 +96,48 @@ export interface ApiError {
   code: string;
   details?: string;
 }
+
+// ── Step 3: record-drop-action shapes ─────────────────────────────────────────
+
+export interface RecordActionRequest {
+  drop_id: string;
+  target_user_id: string;
+  action: DropActionType;
+}
+
+export interface RecordActionResponse {
+  matched: boolean;
+  chat_thread_id?: string;  // present only when matched === true
+  action: DropActionType;
+  processed_at: string;
+}
+
+// FCM payload structure (v1 HTTP API)
+export interface FcmNotificationMessage {
+  token: string;
+  notification: {
+    title: string;
+    body: string;
+  };
+  data: Record<string, string>;
+  apns?: {
+    payload: {
+      aps: {
+        badge?: number;
+        sound?: string;
+        alert?: string;
+      };
+    };
+  };
+  android?: {
+    priority?: "normal" | "high";
+    notification?: {
+      sound?: string;
+      channel_id?: string;
+    };
+  };
+}
+
+export interface FcmPayload {
+  message: FcmNotificationMessage;
+}
