@@ -71,10 +71,8 @@ CREATE TABLE users (
     full_name                   TEXT NOT NULL,
     display_name                TEXT,
     date_of_birth               DATE NOT NULL,
-    -- Age stored as generated column to stay current
-    age                         INTEGER GENERATED ALWAYS AS (
-                                    EXTRACT(YEAR FROM AGE(date_of_birth))::INTEGER
-                                ) STORED,
+    -- Age kept current by trg_compute_age trigger (generated columns cannot use AGE())
+    age                         INTEGER,
     gender                      gender_type NOT NULL,
     bio                         TEXT,
     profile_photos              TEXT[] NOT NULL DEFAULT '{}',
@@ -227,6 +225,28 @@ CREATE INDEX idx_verifications_pending ON verifications (submitted_at) WHERE sta
 
 -- GIN index for array containment queries (religion filter, language filter)
 CREATE INDEX idx_users_languages_gin ON users USING GIN (languages);
+
+-- ============================================================
+-- FUNCTION: updated_at auto-stamp
+-- ============================================================
+
+-- ============================================================
+-- FUNCTION: compute_age trigger
+-- AGE() is not immutable so it cannot be used in a generated column.
+-- This trigger recomputes age on every INSERT or date_of_birth UPDATE.
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION compute_age()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    NEW.age := EXTRACT(YEAR FROM AGE(NEW.date_of_birth))::INTEGER;
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_compute_age
+    BEFORE INSERT OR UPDATE OF date_of_birth ON users
+    FOR EACH ROW EXECUTE FUNCTION compute_age();
 
 -- ============================================================
 -- FUNCTION: updated_at auto-stamp
