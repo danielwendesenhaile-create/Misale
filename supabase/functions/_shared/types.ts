@@ -97,7 +97,7 @@ export interface ApiError {
   details?: string;
 }
 
-// ── Step 3: record-drop-action shapes ─────────────────────────────────────────
+// ── Step 3: record-drop-action shapes ────────────────────────────────────────
 
 export interface RecordActionRequest {
   drop_id: string;
@@ -140,4 +140,22 @@ export interface FcmNotificationMessage {
 
 export interface FcmPayload {
   message: FcmNotificationMessage;
+}
+
+// ── Step 4: admin-verify-user shapes ─────────────────────────────────────────
+
+export interface AdminVerifyRequest {
+  target_user_id: string;
+  status: "approved" | "rejected";
+  admin_notes?: string;
+  reviewed_by?: string;
+}
+
+export interface AdminVerifyResponse {
+  success: boolean;
+  target_user_id: string;
+  verification_id: string;
+  status: "approved" | "rejected";
+  is_verified: boolean;
+  processed_at: string;
 }
