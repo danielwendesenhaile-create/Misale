@@ -157,6 +157,7 @@ interface OnboardingContextValue {
   dispatch: React.Dispatch<OnboardingAction>;
   goToStep: (step: OnboardingStep) => void;
   submitProfile: () => Promise<boolean>;
+  onComplete: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingContextValue | null>(null);
@@ -165,8 +166,10 @@ const OnboardingContext = createContext<OnboardingContextValue | null>(null);
 
 export function OnboardingProvider({
   children,
+  onComplete = () => {},
 }: {
   children: React.ReactNode;
+  onComplete?: () => void;
 }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -235,7 +238,7 @@ export function OnboardingProvider({
   }, [state]);
 
   return (
-    <OnboardingContext.Provider value={{ state, dispatch, goToStep, submitProfile }}>
+    <OnboardingContext.Provider value={{ state, dispatch, goToStep, submitProfile, onComplete }}>
       {children}
     </OnboardingContext.Provider>
   );

@@ -129,7 +129,7 @@ const tierStyles = StyleSheet.create({
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export function LocationScreen() {
-  const { state, dispatch, submitProfile } = useOnboarding();
+  const { state, dispatch, submitProfile, onComplete } = useOnboarding();
 
   const [tier,       setTier]       = useState<LocationTierType | null>(state.locationTier);
   const [city,       setCity]       = useState<string | null>(state.city);
@@ -176,6 +176,8 @@ export function LocationScreen() {
     const ok = await submitProfile();
     if (ok) {
       setSuccess(true);
+      // Brief celebration, then enter the main app
+      setTimeout(() => onComplete(), 1800);
     } else {
       setError(state.submitError ?? "Something went wrong. Please try again.");
     }
