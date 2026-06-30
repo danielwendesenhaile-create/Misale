@@ -46,6 +46,10 @@
     "@babel/core": "^7.25.0",
     "@types/react": "~18.3.12",
     "@types/react-native": "^0.73.0",
+    "metro": "0.81.5",
+    "metro-config": "0.81.5",
+    "metro-resolver": "0.81.5",
+    "metro-runtime": "0.81.5",
     "supabase": "^1.200.0",
     "typescript": "^5.9.3"
   },
