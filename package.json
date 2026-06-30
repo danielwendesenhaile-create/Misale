@@ -1,0 +1,24 @@
+{
+  "name": "misale-backend",
+  "version": "0.1.0",
+  "description": "Misale (ምሳሌ) — MVP backend: database schema, migrations, and seed data",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "seed": "node src/seed/seed.js",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "lint:sql": "node scripts/validate-sql.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "supabase": "^1.200.0"
+  }
+}
